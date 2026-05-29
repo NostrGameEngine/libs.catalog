@@ -15,63 +15,31 @@ jobs:
   dispatch-refresh:
     name: Dispatch catalog refresh
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - repo: adcity-demo
-            ref: master
-          - repo: bech32
-            ref: master
-          - repo: bolt11
-            ref: master
-          - repo: cap-cache-generator
-            ref: main
-          - repo: image-webp-decoder
-            ref: master
-          - repo: libJGLIOS
-            ref: master
-          - repo: libdatachannel-java
-            ref: master
-          - repo: lnurl4j
-            ref: master
-          - repo: nanosvg-chicory-java
-            ref: master
-          - repo: nge-app-template
-            ref: master
-          - repo: nge-platforms
-            ref: master
-          - repo: ngengine
-            ref: master
-          - repo: nostr4j
-            ref: master
-          - repo: nostrads
-            ref: master
-          - repo: saferalloc
-            ref: master
-          - repo: sea-of-nostriches-demo
-            ref: master
-          - repo: stb-image
-            ref: master
 
     steps:
       - name: Dispatch refresh workflow
         env:
           GH_TOKEN: ${{ secrets.CATALOG_PROPAGATION_TOKEN }}
-          REPO: ${{ matrix.repo }}
-          REF: ${{ matrix.ref }}
         run: |
           set -euo pipefail
           if [ -z "${GH_TOKEN}" ]; then
             echo "Missing CATALOG_PROPAGATION_TOKEN secret."
-            echo "Create a fine-grained token with Actions:write and Contents:read access to the target repositories."
+            echo "Create a fine-grained token with Actions:write and Contents:read access to the organization repositories."
             exit 1
           fi
 
-          curl --fail-with-body \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/NostrGameEngine/${REPO}/actions/workflows/refresh-catalog.yml/dispatches" \
-            -d "{\"ref\":\"${REF}\"}"
+          gh api --paginate "/orgs/NostrGameEngine/repos?type=all&per_page=100" \
+            --jq '.[] | select(.archived | not) | [.name, .default_branch] | @tsv' |
+          while IFS=$'\t' read -r repo default_branch; do
+            workflow_path=".github/workflows/refresh-catalog.yml"
+            if gh api \
+              "/repos/NostrGameEngine/${repo}/contents/${workflow_path}?ref=${default_branch}" \
+              >/dev/null 2>&1; then
+              echo "Dispatching ${repo}/${workflow_path} on ${default_branch}"
+              gh workflow run refresh-catalog.yml \
+                --repo "NostrGameEngine/${repo}" \
+                --ref "${default_branch}"
+            else
+              echo "Skipping ${repo}: no ${workflow_path} on ${default_branch}"
+            fi
+          done
