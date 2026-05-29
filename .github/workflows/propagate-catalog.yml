@@ -1,0 +1,45 @@
+name: Propagate Catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - libs.versions.toml
+      - .github/workflows/propagate-catalog.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch-refresh:
+    name: Dispatch catalog refresh
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dispatch refresh workflow
+        env:
+          GH_TOKEN: ${{ secrets.CATALOG_PROPAGATION_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "Missing CATALOG_PROPAGATION_TOKEN secret."
+            echo "Create a fine-grained token with Actions:write and Contents:read access to the organization repositories."
+            exit 1
+          fi
+
+          gh api --paginate "/orgs/NostrGameEngine/repos?type=all&per_page=100" \
+            --jq '.[] | select(.archived | not) | [.name, .default_branch] | @tsv' |
+          while IFS=$'\t' read -r repo default_branch; do
+            workflow_path=".github/workflows/refresh-catalog.yml"
+            if gh api \
+              "/repos/NostrGameEngine/${repo}/contents/${workflow_path}?ref=${default_branch}" \
+              >/dev/null 2>&1; then
+              echo "Dispatching ${repo}/${workflow_path} on ${default_branch}"
+              gh workflow run refresh-catalog.yml \
+                --repo "NostrGameEngine/${repo}" \
+                --ref "${default_branch}"
+            else
+              echo "Skipping ${repo}: no ${workflow_path} on ${default_branch}"
+            fi
+          done
