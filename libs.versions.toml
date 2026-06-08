@@ -31,7 +31,7 @@ nanosvgChicoryJava = "0.1"
 ngengine = "0.2.0"
 ngePlatform = "0.2.4"
 nostr4j = "0.3.1"
-nostrads = "0.2.4"
+nostrads = "0.2.5"
 saferalloc = "0.0.10"
 stbImage = "2.30.5"
 
