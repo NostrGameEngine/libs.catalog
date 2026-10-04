@@ -15,8 +15,7 @@ ngePlatformSnapshot = "0.3.0-SNAPSHOT"
 nostr4jSnapshot = "0.3.0-SNAPSHOT"
 nostradsSnapshot = "0.2.0-SNAPSHOT"
 saferallocSnapshot = "0.0.10"
-stbImageSnapshot = "2.30.5"
-
+stbImageSnapshot = "2.30.6"
 # Release versions for NostrGameEngine libraries
 angle = "2026-05-09"
 bech32 = "1.2.1"
@@ -33,7 +32,7 @@ ngePlatform = "0.2.4"
 nostr4j = "0.3.1"
 nostrads = "0.2.6"
 saferalloc = "0.0.10"
-stbImage = "2.30.5"
+stbImage = "2.30.6"
 
 # Transitive dependency and build-tool versions
 androidGradlePlugin = "9.1.1"
