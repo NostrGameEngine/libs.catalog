@@ -14,9 +14,9 @@ ngengineSnapshot = "0.3.0-SNAPSHOT"
 ngePlatformSnapshot = "0.3.0-SNAPSHOT"
 nostr4jSnapshot = "0.3.0-SNAPSHOT"
 nostradsSnapshot = "0.2.0-SNAPSHOT"
-saferallocSnapshot = "0.0.10"
+saferallocSnapshot = "0.0.11"
 stbImageSnapshot = "2.30.6"
-nativeBootstrapSnapshot = "0.1.0-SNAPSHOT"
+nativeBootstrapSnapshot = "0.1.1"
 
 # Release versions for NostrGameEngine libraries
 angle = "2026-05-09"
@@ -33,9 +33,9 @@ ngengine = "0.2.0"
 ngePlatform = "0.2.4"
 nostr4j = "0.3.1"
 nostrads = "0.2.6"
-saferalloc = "0.0.10"
+saferalloc = "0.0.11"
 stbImage = "2.30.6"
-nativeBootstrap = "0.1.0"
+nativeBootstrap = "0.1.1"
 
 # Transitive dependency and build-tool versions
 androidGradlePlugin = "9.1.1"
